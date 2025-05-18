@@ -41,7 +41,7 @@ class Log:
 
 class Pyscript:
     """Global variables and functions in the pyscript namespace."""
-    audio_cast_playing: bool = False
+    audio_cast_streaming: bool = False
     tv_playing: bool = False
     speaker_sound: bool = False
 

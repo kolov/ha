@@ -5,6 +5,7 @@ from datetime import datetime
 audio_cast_playing: bool
 tv_playing: bool
 speaker_sound: bool
+espresso_power_avg: int
 
 # State management
 class State:
@@ -40,3 +41,4 @@ log: Log
 # Decorators
 def state_trigger(trigger: str) -> Callable: ...
 def time_trigger(trigger: str) -> Callable: ... 
+def mqtt_trigger(trigger: str) -> Callable: ...

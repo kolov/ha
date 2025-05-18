@@ -1,8 +1,8 @@
-name: Release Home Assistant Pyscripts
+name: Release Home Assistant Pyscript
 
 on:
   push:
-    branches: [ master ]   
+    branches: [ never ]   # releasing is no really needed
 
 permissions:
   contents: write
@@ -14,15 +14,15 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Zip the pyscripts folder
+      - name: Zip the pyscript folder
         run: |
-          zip -r pyscripts.zip pyscripts/
+          zip -r pyscript.zip pyscript/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1 
         with:
            tag_name: release-${{ github.run_number }}
-           name: "HA Pyscripts ${{ github.run_number }}"
+           name: "HA Pyscript ${{ github.run_number }}"
            body: "Auto-release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -31,6 +31,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: release-${{ github.run_number }}
-          files: pyscripts.zip
+          files: pyscript.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
