@@ -1,2 +1,2 @@
-# ha
-scripts for home
+# Pyscripts for Home Assistant
+

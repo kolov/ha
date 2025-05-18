@@ -1,0 +1,36 @@
+name: Release Home Assistant Pyscripts
+
+on:
+  push:
+    branches: [ main ]   
+
+permissions:
+  contents: write
+
+jobs:
+  zip-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Zip the pyscripts folder
+        run: |
+          zip -r pyscripts.zip pyscripts/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1 
+        with:
+           tag_name: release-${{ github.run_number }}
+           name: "HA Pyscripts ${{ github.run_number }}"
+           body: "Auto-release"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload ZIP to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: release-${{ github.run_number }}
+          files: pyscripts.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
