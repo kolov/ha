@@ -82,12 +82,14 @@ def turn_off_if_idle(value=None):
         set_state_none(VAR_LAST_LOW_POWER)      
 
 
-@state_trigger("sensor.espresso_machine_power | float > 800")
+@state_trigger("sensor.espresso_machine_power")
 async def coffee_counter(value=None):
     task.unique("coffee_counter", kill_me=True)
     try:
         power = float(value)
     except (ValueError, TypeError):
+        return
+    if power < 800:
         return
 
     log.info(f"☕ Power above 800W detected ({power}W) — waiting 10 seconds to confirm...")
