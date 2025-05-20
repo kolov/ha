@@ -72,7 +72,9 @@ def turn_off_if_idle(value=None):
         last_low_power=get_state_datetime(VAR_LAST_LOW_POWER)
         log.info(f"Last low power: {last_low_power}")
         if last_low_power is None: 
-            set_state_datetime(VAR_LAST_LOW_POWER, now)     
+            log.info("No last low power — setting now")
+            set_state_datetime(VAR_LAST_LOW_POWER, now)   
+            log.info(f"Last low power set to {get_state_datetime(VAR_LAST_LOW_POWER)}")
         else:                   
             if now - last_low_power >= timedelta(minutes=SWITCH_AFTER_LOW_POWER_MINUTES):
                 log.info(f"☕ Power {power}W below threshold for 6 min — cycling power")
