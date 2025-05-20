@@ -59,12 +59,11 @@ set_state_none(VAR_LAST_LOW_POWER)
 
 @state_trigger("pyscript.espresso_power_avg")
 @time_trigger("cron(* * * * *)") 
-def turn_off_if_idle(value=None):
-    
+def turn_off_if_idle(**kwargs: Dict[str, Any]):
     try:
-        power = int(value)   
+        power = int(kwargs["value"])   
     except (ValueError, TypeError):
-        log.error(f"Failed to parse power: {value}")
+        log.error(f"Failed to parse power: {kwargs['value']}")
         return
 
     now = datetime.now()
