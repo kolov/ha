@@ -59,15 +59,17 @@ set_state_none(VAR_LAST_LOW_POWER)
  
 @time_trigger("cron(* * * * *)") 
 def turn_off_if_idle(value=None):
+    log.info("Checking if espresso machine is idle")
     try:
         power = int(pyscript.espresso_power_avg)   
     except (ValueError, TypeError):
         log.error(f"Failed to parse power: {pyscript.espresso_power_avg}")
         return
 
-    now = datetime.now()
+  
 
     if 1 < power < 400:
+        now = datetime.now()
         last_low_power=get_state_datetime(VAR_LAST_LOW_POWER)
         if last_low_power is None: 
             set_state_datetime(VAR_LAST_LOW_POWER, now)     
@@ -79,6 +81,7 @@ def turn_off_if_idle(value=None):
                 service.call("switch", "turn_on", entity_id="switch.espresso_machine")
                 set_state_none(VAR_LAST_LOW_POWER)
     else:
+        log.info("Espresso power is outside of range — resetting last low power")
         set_state_none(VAR_LAST_LOW_POWER)      
 
 
