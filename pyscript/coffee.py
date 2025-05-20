@@ -66,8 +66,7 @@ def turn_off_if_idle(value=None):
         log.error(f"Failed to parse power: {pyscript.espresso_power_avg}")
         return
 
-  
-
+    log.info(f"Espresso power: {power}W")
     if 1 < power < 400:
         now = datetime.now()
         last_low_power=get_state_datetime(VAR_LAST_LOW_POWER)
