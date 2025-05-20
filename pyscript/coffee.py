@@ -56,14 +56,13 @@ def update_power_average(payload=None):
 
 VAR_LAST_LOW_POWER: str = "last_low_power" 
 set_state_none(VAR_LAST_LOW_POWER)
-
-@state_trigger("pyscript.espresso_power_avg")
+ 
 @time_trigger("cron(* * * * *)") 
-def turn_off_if_idle(**kwargs: Dict[str, Any]):
+def turn_off_if_idle(value=None):
     try:
-        power = int(kwargs["value"])   
+        power = int(pyscript.espresso_power_avg)   
     except (ValueError, TypeError):
-        log.error(f"Failed to parse power: {kwargs['value']}")
+        log.error(f"Failed to parse power: {pyscript.espresso_power_avg}")
         return
 
     now = datetime.now()
