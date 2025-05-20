@@ -70,6 +70,7 @@ def turn_off_if_idle(value=None):
     if 1 < power < 400:
         now = datetime.now()
         last_low_power=get_state_datetime(VAR_LAST_LOW_POWER)
+        log.info(f"Last low power: {last_low_power}")
         if last_low_power is None: 
             set_state_datetime(VAR_LAST_LOW_POWER, now)     
         else:                   
