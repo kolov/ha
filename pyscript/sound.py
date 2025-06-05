@@ -138,12 +138,10 @@ def turn_off() -> None:
     set_state_datetime(VAR_LAST_OFF_TIME, datetime.now())
 
 @time_trigger("cron(* * * * *)")
-def turn_off_if_silent() -> None:
-    log.info("🔊 Checking if stereo should be turned off")
-    something_playing = get_state_bool(VAR_SOMETHING_PLAYING)
-    log.info(f"Something playing: {something_playing}")
+def turn_off_if_silent() -> None: 
     stereo_on = state.get(SWITCH) == "on"
     if stereo_on:
+        something_playing = get_state_bool(VAR_SOMETHING_PLAYING) 
         log.info("stereo is on now")
         if something_playing:
             clear_silence_start()

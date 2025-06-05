@@ -39,10 +39,7 @@ def update_power_average(payload=None):
         return
 
     now = datetime.now()
-
- 
     power_history.append((now, power))
- 
     cutoff = now - timedelta(minutes=5)
     power_history = [(ts, val) for ts, val in power_history if ts >= cutoff]
 
@@ -51,15 +48,12 @@ def update_power_average(payload=None):
         for _, val in power_history:
           total += val 
         pyscript.espresso_power_avg=int(total / len(power_history))
-        log.info(f"☕ Power avg over 3min: {pyscript.espresso_power_avg}W from {len(power_history)} readings")
-
 
 VAR_LAST_LOW_POWER: str = "last_low_power" 
 set_state_none(VAR_LAST_LOW_POWER)
  
 @time_trigger("cron(* * * * *)") 
-def turn_off_if_idle(value=None):
-    log.info("Checking if espresso machine is idle")
+def turn_off_if_idle(value=None): 
     try:
         power = int(pyscript.espresso_power_avg)   
     except (ValueError, TypeError):
@@ -82,8 +76,7 @@ def turn_off_if_idle(value=None):
                 task.sleep(5)
                 service.call("switch", "turn_on", entity_id="switch.espresso_machine")
                 set_state_none(VAR_LAST_LOW_POWER)
-    else:
-        log.info("Espresso power is outside of range — resetting last low power")
+    else: 
         set_state_none(VAR_LAST_LOW_POWER)      
 
 
