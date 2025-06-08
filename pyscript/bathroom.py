@@ -17,9 +17,14 @@ except ImportError:
 from datetime import datetime, timedelta
 
 MAX_FAN_RUN_TIME = timedelta(hours=1)
+# ok if humidity difference is less than this value
 HUMIDITY_DIFF_OK = 10   
+# max fan above this value
 HUMIDITY_MAX_FAN = 80
-HUMIDITY_MEDIUM_FAN = 70
+# high fan above this value
+HUMIDITY_HIGH_FAN = 70
+# medium fan above this value
+HUMIDITY_MEDIUM_FAN = 60
 
 fan_start_time = None
 cooldown_until = None
@@ -78,11 +83,16 @@ def check_bathroom_humidity():
         service.call("rest_command", "send_fan_max")
         if not fan_start_time:
             fan_start_time = now
+    elif bathroom_humidity > HUMIDITY_HIGH_FAN:
+        log.info(f"💨 Bathroom humidity > {HUMIDITY_HIGH_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — setting fan to high")
+        service.call("rest_command", "send_fan_high")
+        if not fan_start_time:
+            fan_start_time = now
     elif bathroom_humidity > HUMIDITY_MEDIUM_FAN:
         log.info(f"💨 Bathroom humidity > {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — setting fan to medium")
         service.call("rest_command", "send_fan_medium")
         if not fan_start_time:
-            fan_start_time = now
+            fan_start_time = now            
     else:
         log.info(f"🌬️ Bathroom humidity <= {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — setting fan to low")
         service.call("rest_command", "send_fan_low")
