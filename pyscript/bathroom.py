@@ -20,9 +20,9 @@ MAX_FAN_RUN_TIME = timedelta(hours=1)
 # ok if humidity difference is less than this value
 HUMIDITY_DIFF_OK = 10   
 # max fan above this value
-HUMIDITY_MAX_FAN = 90
+HUMIDITY_MAX_FAN = 85
 # high fan above this value
-HUMIDITY_HIGH_FAN = 85
+HUMIDITY_HIGH_FAN = 68
 # medium fan above this value
 HUMIDITY_MEDIUM_FAN = 60
 
