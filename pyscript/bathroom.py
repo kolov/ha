@@ -16,15 +16,21 @@ except ImportError:
     pass
 from datetime import datetime, timedelta
 
+#########
+#
+# Built around https://github.com/eelcohn/nRF905-API
+#
+#########
+
 MAX_FAN_RUN_TIME = timedelta(hours=1)
 # ok if humidity difference is less than this value
 HUMIDITY_DIFF_OK = 10   
 # max fan above this value
 HUMIDITY_MAX_FAN = 85
 # high fan above this value
-HUMIDITY_HIGH_FAN = 68
+HUMIDITY_HIGH_FAN = 75
 # medium fan above this value
-HUMIDITY_MEDIUM_FAN = 60
+HUMIDITY_MEDIUM_FAN = 65
 
 fan_start_time = None
 cooldown_until = None
