@@ -28,9 +28,9 @@ HUMIDITY_DIFF_OK = 10
 # max fan above this value
 HUMIDITY_MAX_FAN = 85
 # high fan above this value
-HUMIDITY_HIGH_FAN = 75
+HUMIDITY_HIGH_FAN = 70
 # medium fan above this value
-HUMIDITY_MEDIUM_FAN = 65
+HUMIDITY_MEDIUM_FAN = 60
 
 fan_start_time = None
 cooldown_until = None
@@ -42,9 +42,7 @@ def check_bathroom_humidity():
     global fan_start_time, cooldown_until, last_humidity
 
     bathroom_humidity = state.get("sensor.t_h_inside_bathroom_humidity")
-    room_humidity = state.get("sensor.meter_61e8_humidity")
-    
-    log.info(f"🛁 Bathroom humidity is {bathroom_humidity}, room humidity is {room_humidity}")
+    room_humidity = state.get("sensor.meter_61e8_humidity") 
 
     if bathroom_humidity is not None:
         last_humidity = float(bathroom_humidity)
