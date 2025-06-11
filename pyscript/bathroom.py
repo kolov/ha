@@ -23,6 +23,7 @@ from datetime import datetime, timedelta
 #########
 
 MAX_FAN_RUN_TIME = timedelta(hours=1)
+FAN_COOLDOWN_TIME = timedelta(minutes=5)
 # ok if humidity difference is less than this value
 HUMIDITY_DIFF_OK = 10   
 # max fan above this value
@@ -37,12 +38,27 @@ cooldown_until = None
 last_humidity = None
 last_query_time = None
 
+last_fan_level = None
+
+def set_fan_level(level):
+    global last_fan_level
+    if last_fan_level == level:
+        return
+    if level != "low":
+        if fan_start_time is None:
+            fan_start_time = datetime.now()
+    else:
+        fan_start_time = None
+    last_fan_level = level
+    log.info(f"🌬️ Setting fan to {level}")
+    service.call("rest_command", f"send_fan_{level}")
+
 @time_trigger("cron(* * * * *)")
 def check_bathroom_humidity():
     global fan_start_time, cooldown_until, last_humidity
 
     bathroom_humidity = state.get("sensor.t_h_inside_bathroom_humidity")
-    room_humidity = state.get("sensor.meter_61e8_humidity") 
+    room_humidity = state.get("sensor.t_h_inside_bedroom") 
 
     if bathroom_humidity is not None:
         last_humidity = float(bathroom_humidity)
@@ -73,32 +89,24 @@ def check_bathroom_humidity():
         log.info("🔄 Fan ran on medium/max for 1h — setting to low and entering cooldown.")
         service.call("rest_command", "send_fan_low")
         fan_start_time = None
-        cooldown_until = now + timedelta(minutes=15)
+        cooldown_until = now + FAN_COOLDOWN_TIME
         return
     
     if humidity_diff < HUMIDITY_DIFF_OK:
         log.info(f"✅ Humidity difference <= {HUMIDITY_DIFF_OK}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — setting fan to low")
-        service.call("rest_command", "send_fan_low")
-        fan_start_time = None
+        set_fan_level("low")
         return
 
     if bathroom_humidity > HUMIDITY_MAX_FAN:
-        log.info(f"🔥 Bathroom humidity > {HUMIDITY_MAX_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — setting fan to max")
-        service.call("rest_command", "send_fan_max")
-        if not fan_start_time:
-            fan_start_time = now
+        log.info(f"🔥 Bathroom humidity > {HUMIDITY_MAX_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — fan should be max")
+        set_fan_level("max")
     elif bathroom_humidity > HUMIDITY_HIGH_FAN:
-        log.info(f"💨 Bathroom humidity > {HUMIDITY_HIGH_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — setting fan to high")
-        service.call("rest_command", "send_fan_high")
-        if not fan_start_time:
-            fan_start_time = now
+        log.info(f"💨 Bathroom humidity > {HUMIDITY_HIGH_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — fan should be high")
+        set_fan_level("high")
     elif bathroom_humidity > HUMIDITY_MEDIUM_FAN:
-        log.info(f"💨 Bathroom humidity > {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — setting fan to medium")
-        service.call("rest_command", "send_fan_medium")
-        if not fan_start_time:
-            fan_start_time = now            
+        log.info(f"💨 Bathroom humidity > {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — fan should be medium")
+        set_fan_level("medium")
     else:
-        log.info(f"🌬️ Bathroom humidity <= {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — setting fan to low")
-        service.call("rest_command", "send_fan_low")
-        fan_start_time = None
+        log.info(f"🌬️ Bathroom humidity <= {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — fan should be low")
+        set_fan_level("low")
  
