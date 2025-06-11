@@ -31,7 +31,7 @@ HUMIDITY_MAX_FAN = 85
 # high fan above this value
 HUMIDITY_HIGH_FAN = 63
 # medium fan above this value
-HUMIDITY_MEDIUM_FAN = 50
+HUMIDITY_MEDIUM_FAN = 58
 
 fan_start_time = None
 cooldown_until = None
