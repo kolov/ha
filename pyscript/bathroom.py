@@ -58,7 +58,7 @@ def check_bathroom_humidity():
     global fan_start_time, cooldown_until, last_humidity
 
     bathroom_humidity = state.get("sensor.t_h_inside_bathroom_humidity")
-    room_humidity = state.get("sensor.t_h_inside_bedroom") 
+    room_humidity = state.get("sensor.t_h_inside_bedroom_humidity") 
 
     if bathroom_humidity is not None:
         last_humidity = float(bathroom_humidity)
