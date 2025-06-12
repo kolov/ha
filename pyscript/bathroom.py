@@ -41,7 +41,7 @@ last_query_time = None
 last_fan_level = None
 
 def set_fan_level(level):
-    global last_fan_level
+    global last_fan_level, fan_start_time
     if last_fan_level == level:
         return
     if level != "low":
