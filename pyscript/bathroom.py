@@ -24,6 +24,7 @@ from datetime import datetime, timedelta
 
 MAX_FAN_RUN_TIME = timedelta(hours=1)
 FAN_COOLDOWN_TIME = timedelta(minutes=5)
+MIN_SERVICE_CALL_INTERVAL = timedelta(minutes=5)
 # ok if humidity difference is less than this value
 HUMIDITY_DIFF_OK = 10   
 # max fan above this value
@@ -37,19 +38,16 @@ fan_start_time = None
 cooldown_until = None
 last_humidity = None
 last_query_time = None
-
-last_fan_level = None
+ 
 
 def set_fan_level(level):
-    global last_fan_level, fan_start_time
-    if last_fan_level == level:
-        return
+    global fan_start_time
+        
     if level != "low":
         if fan_start_time is None:
             fan_start_time = datetime.now()
     else:
-        fan_start_time = None
-    last_fan_level = level
+        fan_start_time = None 
     log.info(f"🌬️ Setting fan to {level}")
     service.call("rest_command", f"send_fan_{level}")
 
