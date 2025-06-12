@@ -26,6 +26,7 @@ COFFE_MAKING_POWER_LOWER = 800
 COFFEE_MAKING_DURATION_MIN_SECONDS = 10
 
 power_history = []
+pyscript.espresso_power_avg = 0  # Initialize power average
 
 @mqtt_trigger("zigbee2mqtt/espresso_machine")
 def update_power_average(payload=None):
