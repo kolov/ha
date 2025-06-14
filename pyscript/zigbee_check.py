@@ -46,7 +46,9 @@ def handle_zigbee_message(topic=None, payload=None):
 def check_missing_zigbee_devices(): 
     cutoff = datetime.now() - timedelta(hours=3)
     missing = []
+    now = datetime.now()
 
+    # First check for missing devices
     for device, ts_str in global_last_seen.items():
         try:
             ts = datetime.fromisoformat(ts_str)
@@ -58,5 +60,19 @@ def check_missing_zigbee_devices():
     if missing:
         log.warning(f"⚠️ No MQTT from: {', '.join(missing)} in the last 3 hours")
         # Optional: notify.notify(message=f"Zigbee devices missing: {', '.join(missing)}")
-    else:
-        log.info(f"✅ All Zigbee devices reporting normally: {global_last_seen}")
+    
+    # Then show status for all devices
+    log.info("📱 Zigbee device status:")
+    for device, ts_str in sorted(global_last_seen.items()):
+        try:
+            ts = datetime.fromisoformat(ts_str)
+            time_ago = now - ts
+            if time_ago.total_seconds() < 60:
+                ago = f"{int(time_ago.total_seconds())}s ago"
+            elif time_ago.total_seconds() < 3600:
+                ago = f"{int(time_ago.total_seconds() / 60)}m ago"
+            else:
+                ago = f"{int(time_ago.total_seconds() / 3600)}h ago"
+            log.info(f"  • {device}: {ago}")
+        except Exception as e:
+            log.warning(f"  • {device}: Invalid timestamp ({e})")
