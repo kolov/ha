@@ -36,7 +36,7 @@ def update_power_average(payload=None):
         data = json.loads(payload)
         power = float(data.get("power", 0))
     except Exception as e:
-        log.error(f"Failed to parse MQTT power payload: {e}")
+        log.debug(f"Failed to parse MQTT power payload: {e}")
         return
 
     now = datetime.now()
