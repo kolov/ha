@@ -24,7 +24,9 @@ global_last_seen = {}
 def handle_zigbee_message(topic=None, payload=None):
     from datetime import datetime
 
-    log.info(f"Got message from {topic}")
+    # exlude messages starting with zigbee2mqtt/bridge
+    if topic.startswith("zigbee2mqtt/bridge/"): 
+        return
 
     # Extract everything after "zigbee2mqtt/"
     if topic.startswith("zigbee2mqtt/"):
