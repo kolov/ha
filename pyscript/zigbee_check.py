@@ -15,7 +15,7 @@ def handle_zigbee_message(topic=None, payload=None):
     log.debug(f"Updated global_last_seen[{device}] = {now_str}")
 
 
-@time_trigger("period(minutes=5)")
+@time_trigger("cron(* */5 * * * *)")
 def check_missing_zigbee_devices():
     cutoff = datetime.now() - timedelta(hours=3)
     missing = []
