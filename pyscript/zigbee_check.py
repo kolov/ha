@@ -1,8 +1,22 @@
-# zigbee_check.py
-
-# pyscript: persist
-
 from datetime import datetime, timedelta
+
+
+try:
+    from utils import state_inc, set_state_datetime, get_state_datetime, set_state_none
+except ImportError:
+    try:
+        from modules.utils import state_inc, set_state_datetime, get_state_datetime, set_state_none
+    except ImportError:
+         # In Jupyter, execute the content of utils.py in a cell first
+        pass
+
+try:
+    # For the linter
+    from pyscript_types import state, service, task, log, state_trigger, time_trigger, pyscript
+except ImportError:
+    # When running in HASS/Jupyter
+    pass
+
 
 global_last_seen = {}
 
@@ -15,7 +29,7 @@ def handle_zigbee_message(topic=None, payload=None):
     log.debug(f"Updated global_last_seen[{device}] = {now_str}")
 
 
-@time_trigger("cron(* */5 * * * *)")
+@time_trigger("cron(*/5 * * * *)")
 def check_missing_zigbee_devices():
     cutoff = datetime.now() - timedelta(hours=3)
     missing = []
