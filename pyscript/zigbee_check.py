@@ -59,4 +59,4 @@ def check_missing_zigbee_devices():
         log.warning(f"⚠️ No MQTT from: {', '.join(missing)} in the last 3 hours")
         # Optional: notify.notify(message=f"Zigbee devices missing: {', '.join(missing)}")
     else:
-        log.info("✅ All Zigbee devices reporting normally.")
+        log.info(f"✅ All Zigbee devices reporting normally: {global_last_seen}")
