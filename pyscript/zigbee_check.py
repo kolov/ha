@@ -20,13 +20,22 @@ except ImportError:
 
 global_last_seen = {}
 
-@mqtt_trigger("zigbee2mqtt/+/#")
+@mqtt_trigger("zigbee2mqtt/#")
 def handle_zigbee_message(topic=None, payload=None):
-    device = topic.split("/")[1]
-    now_str = datetime.now().isoformat()
+    from datetime import datetime
 
-    global_last_seen[device] = now_str
-    log.debug(f"Updated global_last_seen[{device}] = {now_str}")
+    # Extract everything after "zigbee2mqtt/"
+    if topic.startswith("zigbee2mqtt/"):
+        key = topic[len("zigbee2mqtt/"):]
+    else:
+        log.warning(f"⚠️ Unexpected topic prefix: {topic}")
+        return
+
+    now_str = datetime.now().isoformat()
+    global_last_seen[key] = now_str
+
+    log.debug(f"Updated global_last_seen[{key}] = {now_str}")
+
 
 
 @time_trigger("cron(*/5 * * * *)")
