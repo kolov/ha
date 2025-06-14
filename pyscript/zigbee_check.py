@@ -24,6 +24,8 @@ global_last_seen = {}
 def handle_zigbee_message(topic=None, payload=None):
     from datetime import datetime
 
+    log.info(f"Got message from {topic}")
+
     # Extract everything after "zigbee2mqtt/"
     if topic.startswith("zigbee2mqtt/"):
         key = topic[len("zigbee2mqtt/"):]
@@ -39,7 +41,7 @@ def handle_zigbee_message(topic=None, payload=None):
 
 
 @time_trigger("cron(*/5 * * * *)")
-def check_missing_zigbee_devices():
+def check_missing_zigbee_devices(): 
     cutoff = datetime.now() - timedelta(hours=3)
     missing = []
 
