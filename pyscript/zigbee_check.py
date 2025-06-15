@@ -20,14 +20,26 @@ except ImportError:
 
 global_last_seen = {}
 
+def should_skip_device(device_name: str) -> bool:
+    """Determine if a device should be skipped in status reporting.
+    
+    Args:
+        device_name: The name of the device from the MQTT topic
+        
+    Returns:
+        True if the device should be skipped, False otherwise
+    """
+    # Skip bridge messages
+    if device_name.startswith("bridge/"):
+        return True
+    # Skip any set commands
+    if "/set" in device_name:
+        return True
+    return False
+
 @mqtt_trigger("zigbee2mqtt/#")
 def handle_zigbee_message(topic=None, payload=None):
     from datetime import datetime
-
-    # exlude messages starting with zigbee2mqtt/bridge
-    if topic.startswith("zigbee2mqtt/bridge/"): 
-        return
-    
 
     # Extract everything after "zigbee2mqtt/"
     if topic.startswith("zigbee2mqtt/"):
@@ -36,8 +48,8 @@ def handle_zigbee_message(topic=None, payload=None):
         log.warning(f"⚠️ Unexpected topic prefix: {topic}")
         return
 
-    # Skip any set commands
-    if "/set" in key:
+    # Skip any set commands or bridge messages
+    if should_skip_device(key):
         return
 
     now_str = datetime.now().isoformat()
@@ -55,6 +67,8 @@ def check_missing_zigbee_devices():
 
     # First check for missing devices
     for device, ts_str in global_last_seen.items():
+        if should_skip_device(device):
+            continue
         try:
             ts = datetime.fromisoformat(ts_str)
             if ts < cutoff:
@@ -72,6 +86,8 @@ def check_missing_zigbee_devices():
     # Create list of (device, time_ago) tuples for sorting
     device_times = []
     for device, ts_str in global_last_seen.items():
+        if should_skip_device(device):
+            continue
         try:
             ts = datetime.fromisoformat(ts_str)
             time_ago = now - ts
