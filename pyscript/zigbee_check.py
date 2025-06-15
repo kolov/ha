@@ -27,12 +27,17 @@ def handle_zigbee_message(topic=None, payload=None):
     # exlude messages starting with zigbee2mqtt/bridge
     if topic.startswith("zigbee2mqtt/bridge/"): 
         return
+    
 
     # Extract everything after "zigbee2mqtt/"
     if topic.startswith("zigbee2mqtt/"):
         key = topic[len("zigbee2mqtt/"):]
     else:
         log.warning(f"⚠️ Unexpected topic prefix: {topic}")
+        return
+
+    # Skip any set commands
+    if "/set" in key:
         return
 
     now_str = datetime.now().isoformat()
@@ -63,16 +68,25 @@ def check_missing_zigbee_devices():
     
     # Then show status for all devices
     log.info("📱 Zigbee device status:")
-    for device, ts_str in sorted(global_last_seen.items()):
+    
+    # Create list of (device, time_ago) tuples for sorting
+    device_times = []
+    for device, ts_str in global_last_seen.items():
         try:
             ts = datetime.fromisoformat(ts_str)
             time_ago = now - ts
-            if time_ago.total_seconds() < 60:
-                ago = f"{int(time_ago.total_seconds())}s ago"
-            elif time_ago.total_seconds() < 3600:
-                ago = f"{int(time_ago.total_seconds() / 60)}m ago"
-            else:
-                ago = f"{int(time_ago.total_seconds() / 3600)}h ago"
-            log.info(f"  • {device}: {ago}")
+            device_times.append((device, time_ago))
         except Exception as e:
             log.warning(f"  • {device}: Invalid timestamp ({e})")
+    
+    # Sort by time_ago (ascending, so most recent first)
+    for device, time_ago in sorted(device_times, key=lambda x: x[1]):
+        if time_ago.total_seconds() < 60:
+            ago = f"{int(time_ago.total_seconds())}s ago"
+        elif time_ago.total_seconds() < 3600:
+            ago = f"{int(time_ago.total_seconds() / 60)}m ago"
+        else:
+            hours = int(time_ago.total_seconds() / 3600)
+            minutes = int((time_ago.total_seconds() % 3600) / 60)
+            ago = f"{hours}h {minutes}m ago"
+        log.info(f"  • {device}: {ago}")
