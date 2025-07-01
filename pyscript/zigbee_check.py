@@ -96,13 +96,13 @@ def check_missing_zigbee_devices():
             log.warning(f"  • {device}: Invalid timestamp ({e})")
     
     # Sort by time_ago (ascending, so most recent first)
-    for device, time_ago in sorted(device_times, key=lambda x: x[1]):
-        if time_ago.total_seconds() < 60:
-            ago = f"{int(time_ago.total_seconds())}s ago"
-        elif time_ago.total_seconds() < 3600:
-            ago = f"{int(time_ago.total_seconds() / 60)}m ago"
-        else:
-            hours = int(time_ago.total_seconds() / 3600)
-            minutes = int((time_ago.total_seconds() % 3600) / 60)
-            ago = f"{hours}h {minutes}m ago"
-        log.info(f"  • {device}: {ago}")
+    # for device, time_ago in sorted(device_times, key=lambda x: x[1]):
+    #     if time_ago.total_seconds() < 60:
+    #         ago = f"{int(time_ago.total_seconds())}s ago"
+    #     elif time_ago.total_seconds() < 3600:
+    #         ago = f"{int(time_ago.total_seconds() / 60)}m ago"
+    #     else:
+    #         hours = int(time_ago.total_seconds() / 3600)
+    #         minutes = int((time_ago.total_seconds() % 3600) / 60)
+    #         ago = f"{hours}h {minutes}m ago"
+    #     log.info(f"  • {device}: {ago}")
