@@ -74,7 +74,7 @@ def check_bathroom_humidity():
 
     if bathroom_small_humidity is None or bathroom_small_humidity == 'unknown':
         log.warning("⚠️ Bathroom small humidity sensor not available — assuming 60")
-        bathroom_small_humidity = 95
+        bathroom_small_humidity = 60
 
     try:
         bathroom_humidity = float(bathroom_humidity)
