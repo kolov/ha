@@ -40,6 +40,7 @@ def should_skip_device(device_name: str) -> bool:
 @mqtt_trigger("zigbee2mqtt/#")
 def handle_zigbee_message(topic=None, payload=None):
     from datetime import datetime
+    global_last_seen = {}
 
     # Extract everything after "zigbee2mqtt/"
     if topic.startswith("zigbee2mqtt/"):
@@ -61,6 +62,8 @@ def handle_zigbee_message(topic=None, payload=None):
 
 @time_trigger("cron(*/5 * * * *)")
 def check_missing_zigbee_devices(): 
+    return
+
     cutoff = datetime.now() - timedelta(hours=3)
     missing = []
     now = datetime.now()

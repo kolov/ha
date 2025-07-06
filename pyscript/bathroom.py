@@ -56,6 +56,7 @@ def check_bathroom_humidity():
     global fan_start_time, cooldown_until, last_humidity
 
     bathroom_humidity = state.get("sensor.t_h_inside_sonoff_bathroom_humidity")
+    bathroom_small_humidity = state.get("sensor.t_h_inside_bathroom_small_humidity")
     room_humidity = state.get("sensor.t_h_inside_sonoff_bedroom_humidity") 
 
     if bathroom_humidity is not None:
@@ -68,13 +69,20 @@ def check_bathroom_humidity():
         room_humidity = 55
 
     if bathroom_humidity is None:
-        log.warning("⚠️ Humidity sensor not available — setting fan to low.")
-        service.call("rest_command", "send_fan_low")
-        return
+        log.warning("⚠️ Bathroom humidity sensor not available — assuming 60")
+        bathroom_humidity = 60
+
+    if bathroom_small_humidity is None:
+        log.warning("⚠️ Bathroom small humidity sensor not available — assuming 60")
+        bathroom_small_humidity = 60
 
     bathroom_humidity = float(bathroom_humidity)
+    bathroom_small_humidity = float(bathroom_small_humidity)
+    # Assume small bathroom sensor overreports humidity
+    bathroom_small_humidity_adjusted = bathroom_small_humidity - 10
+    most_humid = max(bathroom_humidity, bathroom_small_humidity_adjusted)
     room_humidity = float(room_humidity)
-    humidity_diff = bathroom_humidity - room_humidity
+    humidity_diff = most_humid - room_humidity 
 
     # In cooldown period → run only on low
     if cooldown_until and now < cooldown_until:
@@ -91,20 +99,21 @@ def check_bathroom_humidity():
         return
     
     if humidity_diff < HUMIDITY_DIFF_OK:
-        log.info(f"✅ Humidity difference <= {HUMIDITY_DIFF_OK}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — setting fan to low")
+        log.info(f"✅ Humidity difference <= {HUMIDITY_DIFF_OK}% (bathroom: {bathroom_humidity}%, small: {bathroom_small_humidity}%→{bathroom_small_humidity_adjusted}%, room: {room_humidity}%, max: {most_humid}%) — setting fan to low")
         set_fan_level("low")
         return
-
-    if bathroom_humidity > HUMIDITY_MAX_FAN:
-        log.info(f"🔥 Bathroom humidity > {HUMIDITY_MAX_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — fan should be max")
+    
+    
+    if most_humid > HUMIDITY_MAX_FAN:
+        log.info(f"🔥 Bathroom humidity > {HUMIDITY_MAX_FAN}% (bathroom: {bathroom_humidity}%, small: {bathroom_small_humidity}%→{bathroom_small_humidity_adjusted}%, room: {room_humidity}%, max: {most_humid}%) — fan should be max")
         set_fan_level("max")
-    elif bathroom_humidity > HUMIDITY_HIGH_FAN:
-        log.info(f"💨 Bathroom humidity > {HUMIDITY_HIGH_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — fan should be high")
+    elif most_humid > HUMIDITY_HIGH_FAN:
+        log.info(f"💨 Bathroom humidity > {HUMIDITY_HIGH_FAN}% (bathroom: {bathroom_humidity}%, small: {bathroom_small_humidity}%→{bathroom_small_humidity_adjusted}%, room: {room_humidity}%, max: {most_humid}%) — fan should be high")
         set_fan_level("high")
-    elif bathroom_humidity > HUMIDITY_MEDIUM_FAN:
-        log.info(f"💨 Bathroom humidity > {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — fan should be medium")
+    elif most_humid > HUMIDITY_MEDIUM_FAN:
+        log.info(f"💨 Bathroom humidity > {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, small: {bathroom_small_humidity}%→{bathroom_small_humidity_adjusted}%, room: {room_humidity}%, max: {most_humid}%) — fan should be medium")
         set_fan_level("medium")
     else:
-        log.info(f"🌬️ Bathroom humidity <= {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, room: {room_humidity}%) — fan should be low")
+        log.info(f"🌬️ Bathroom humidity <= {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, small: {bathroom_small_humidity}%→{bathroom_small_humidity_adjusted}%, room: {room_humidity}%, max: {most_humid}%) — fan should be low")
         set_fan_level("low")
  
