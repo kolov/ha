@@ -64,24 +64,32 @@ def check_bathroom_humidity():
 
     now = datetime.now()
 
-    if room_humidity is None:
+    if room_humidity is None or room_humidity == 'unknown':
         log.info("🏠 Room humidity not available — assuming 55.")
         room_humidity = 55
 
-    if bathroom_humidity is None:
+    if bathroom_humidity is None or bathroom_humidity == 'unknown':
         log.warning("⚠️ Bathroom humidity sensor not available — assuming 60")
         bathroom_humidity = 60
 
-    if bathroom_small_humidity is None:
+    if bathroom_small_humidity is None or bathroom_small_humidity == 'unknown':
         log.warning("⚠️ Bathroom small humidity sensor not available — assuming 60")
         bathroom_small_humidity = 60
 
-    bathroom_humidity = float(bathroom_humidity)
-    bathroom_small_humidity = float(bathroom_small_humidity)
+    try:
+        bathroom_humidity = float(bathroom_humidity)
+        bathroom_small_humidity = float(bathroom_small_humidity)
+        room_humidity = float(room_humidity)
+    except (ValueError, TypeError) as e:
+        log.error(f"❌ Error converting humidity values to float: {e}")
+        log.error(f"   bathroom_humidity: {bathroom_humidity}")
+        log.error(f"   bathroom_small_humidity: {bathroom_small_humidity}")
+        log.error(f"   room_humidity: {room_humidity}")
+        return
+
     # Assume small bathroom sensor overreports humidity
     bathroom_small_humidity_adjusted = bathroom_small_humidity - 10
     most_humid = max(bathroom_humidity, bathroom_small_humidity_adjusted)
-    room_humidity = float(room_humidity)
     humidity_diff = most_humid - room_humidity 
 
     # In cooldown period → run only on low
