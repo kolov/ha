@@ -1,7 +1,34 @@
 # Home Assistant Pyscript Scripts for Home 
 
+## Deployment
+
+In HA terminal, run:
+
+```bash
+cd homeassistant/ha
+./update_ha.sh
+```
+
+where 
+```bash
+
+cat update_ha.sh                  
+#! /bin/bash
+git pull
+rsync -av --delete pyscript/ /homeassistant/pyscript/
+~/homeassistant/reload-python.sh
+
+
+cat ~/homeassistant/reload-python.sh            
+#!/bin/bash
+
+curl -X POST http://localhost:8123/api/services/pyscript/reload \
+  -H "Authorization: Bearer ..." \
+  -H "Content-Type: application/json"
+```
+
 For development use the `develop_hass` Jupyter notebook. 
-If changing utils.py, update the notebok.
+If changing utils.py, update the notebook.
 
 
 Running Victoria metrics

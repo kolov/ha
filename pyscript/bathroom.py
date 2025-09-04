@@ -26,7 +26,7 @@ MAX_FAN_RUN_TIME = timedelta(hours=1)
 FAN_COOLDOWN_TIME = timedelta(minutes=5)
 MIN_SERVICE_CALL_INTERVAL = timedelta(minutes=5)
 # ok if humidity difference is less than this value
-HUMIDITY_DIFF_OK = 10   
+HUMIDITY_DIFF_OK = 6
 # max fan above this value
 HUMIDITY_MAX_FAN = 85
 # high fan above this value
