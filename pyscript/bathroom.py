@@ -30,7 +30,7 @@ HUMIDITY_DIFF_OK = 6
 # max fan above this value
 HUMIDITY_MAX_FAN = 75
 # high fan above this value
-HUMIDITY_HIGH_FAN = 70
+HUMIDITY_HIGH_FAN = 65
 # medium fan above this value
 HUMIDITY_MEDIUM_FAN = 55
 
