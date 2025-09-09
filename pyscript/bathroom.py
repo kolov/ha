@@ -28,7 +28,7 @@ MIN_SERVICE_CALL_INTERVAL = timedelta(minutes=5)
 # ok if humidity difference is less than this value
 HUMIDITY_DIFF_OK = 6
 # max fan above this value
-HUMIDITY_MAX_FAN = 85
+HUMIDITY_MAX_FAN = 75
 # high fan above this value
 HUMIDITY_HIGH_FAN = 70
 # medium fan above this value
