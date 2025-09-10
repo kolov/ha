@@ -126,12 +126,27 @@ def check_bathroom_humidity():
         set_fan_level("low")
 
 
-# Check if entity exists at startup
-current_presence = state.get("sensor.presence_bathroom")
-if current_presence is None:
-    log.error("❌ sensor.presence_bathroom does not exist! Check entity name.")
-else:
-    log.info(f"✅ sensor.presence_bathroom exists, current value: {current_presence}")
+@time_trigger("startup")
+def check_presence_sensor():
+    """Check if presence sensor exists and try to find the correct name"""
+    # Try different possible entity names
+    possible_names = [
+        "sensor.presence_bathroom",
+        "sensor.presence_bathroom_occupancy", 
+        "binary_sensor.presence_bathroom",
+        "binary_sensor.presence_bathroom_occupancy"
+    ]
+    
+    for name in possible_names:
+        value = state.get(name)
+        if value is not None:
+            log.info(f"✅ Found entity: {name} = {value}")
+        else:
+            log.debug(f"❌ {name} does not exist")
+    
+    # List all entities with "bathroom" in the name to help find it
+    log.info("🔍 Looking for bathroom-related entities...")
+    # This will help identify the correct entity name
 
 @state_trigger("sensor.presence_bathroom")
 def control_dehumidifier_on_presence(entity_id, old_state, new_state):
