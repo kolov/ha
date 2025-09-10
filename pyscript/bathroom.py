@@ -124,4 +124,13 @@ def check_bathroom_humidity():
     else:
         log.info(f"🌬️ Bathroom humidity <= {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, small: {bathroom_small_humidity}%→{bathroom_small_humidity_adjusted}%, room: {room_humidity}%, max: {most_humid}%) — fan should be low")
         set_fan_level("low")
- 
+
+
+@state_trigger("sensor.presence_bathroom")
+def control_dehumidifier_on_presence(entity_id, old_state, new_state):
+    if new_state == "on":
+        log.info("👤 Presence detected in bathroom — turning off dehumidifier")
+        service.call("switch", "turn_off", entity_id="switch.dehumidifier")
+    elif new_state == "off":
+        log.info("👤 No presence in bathroom — turning on dehumidifier")
+        service.call("switch", "turn_on", entity_id="switch.dehumidifier")
