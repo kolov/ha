@@ -149,11 +149,11 @@ def check_presence_sensor():
         log.info(f"  • {entity} = {value}")
 
 @state_trigger("binary_sensor.presence_bathroom_occupancy")
-def control_dehumidifier_on_presence(entity_id, old_state, new_state):
-    log.info(f"🚪 Presence trigger fired! entity_id={entity_id}, old={old_state}, new={new_state}")
-    if new_state == "on":
+def control_dehumidifier_on_presence(var_name=None, value=None, old_value=None):
+    log.info(f"🚪 Presence trigger fired! var_name={var_name}, old={old_value}, new={value}")
+    if value == "on":
         log.info("👤 Presence detected in bathroom — turning off dehumidifier")
         service.call("switch", "turn_off", entity_id="switch.dehumidifier")
-    elif new_state == "off":
+    elif value == "off":
         log.info("👤 No presence in bathroom — turning on dehumidifier")
         service.call("switch", "turn_on", entity_id="switch.dehumidifier")
