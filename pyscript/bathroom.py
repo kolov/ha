@@ -125,29 +125,6 @@ def check_bathroom_humidity():
         log.info(f"🌬️ Bathroom humidity <= {HUMIDITY_MEDIUM_FAN}% (bathroom: {bathroom_humidity}%, small: {bathroom_small_humidity}%→{bathroom_small_humidity_adjusted}%, room: {room_humidity}%, max: {most_humid}%) — fan should be low")
         set_fan_level("low")
 
-
-@time_trigger("startup")
-def check_presence_sensor():
-    """Check if presence sensor exists and try to find the correct name"""
-    log.info("🔍 Looking for all entities with 'bathroom' or 'presence' in the name...")
-    
-    # Get all entity names
-    all_entities = state.names()
-    
-    # Filter for bathroom or presence related entities
-    bathroom_entities = [e for e in all_entities if 'bathroom' in e.lower()]
-    presence_entities = [e for e in all_entities if 'presence' in e.lower()]
-    
-    log.info(f"📋 Found {len(bathroom_entities)} bathroom entities:")
-    for entity in bathroom_entities:
-        value = state.get(entity)
-        log.info(f"  • {entity} = {value}")
-    
-    log.info(f"👤 Found {len(presence_entities)} presence entities:")
-    for entity in presence_entities:
-        value = state.get(entity)
-        log.info(f"  • {entity} = {value}")
-
 @state_trigger("binary_sensor.presence_bathroom_occupancy")
 def control_dehumidifier_on_presence(var_name=None, value=None, old_value=None):
     log.info(f"🚪 Presence trigger fired! var_name={var_name}, old={old_value}, new={value}")
