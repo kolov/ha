@@ -126,11 +126,20 @@ def check_bathroom_humidity():
         set_fan_level("low")
 
 @state_trigger("binary_sensor.presence_bathroom_occupancy")
-def control_dehumidifier_on_presence(var_name=None, value=None, old_value=None):
+async def control_dehumidifier_on_presence(var_name=None, value=None, old_value=None):
     log.info(f"🚪 Presence trigger fired! var_name={var_name}, old={old_value}, new={value}")
     if value == "on":
         log.info("👤 Presence detected in bathroom — turning off dehumidifier")
+        task.unique("dehumidifier_delay", kill_me=True)  # Cancel any pending turn-on
         service.call("switch", "turn_off", entity_id="switch.dehumidifier")
     elif value == "off":
-        log.info("👤 No presence in bathroom — turning on dehumidifier")
-        service.call("switch", "turn_on", entity_id="switch.dehumidifier")
+        log.info("👤 No presence in bathroom — waiting 3 minutes before turning on dehumidifier")
+        task.unique("dehumidifier_delay", kill_me=True)
+        await task.sleep(180)  # Wait 3 minutes (180 seconds)
+        # Check if still no presence after waiting
+        current_presence = state.get("binary_sensor.presence_bathroom_occupancy")
+        if current_presence == "off":
+            log.info("⏱️ 3 minutes passed with no presence — turning on dehumidifier")
+            service.call("switch", "turn_on", entity_id="switch.dehumidifier")
+        else:
+            log.info("👤 Presence detected during wait period — keeping dehumidifier off")
