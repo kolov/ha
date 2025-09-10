@@ -148,7 +148,7 @@ def check_presence_sensor():
         value = state.get(entity)
         log.info(f"  • {entity} = {value}")
 
-@state_trigger("sensor.presence_bathroom")
+@state_trigger("binary_sensor.presence_bathroom_occupancy")
 def control_dehumidifier_on_presence(entity_id, old_state, new_state):
     log.info(f"🚪 Presence trigger fired! entity_id={entity_id}, old={old_state}, new={new_state}")
     if new_state == "on":
