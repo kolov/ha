@@ -128,13 +128,13 @@ def check_bathroom_humidity():
 @state_trigger("binary_sensor.presence_bathroom_occupancy")
 async def control_dehumidifier_on_presence(var_name=None, value=None, old_value=None):
 
-     now = datetime.now()
-     # Block dehumidifier ON between 23:00 and 08:00
-     if 23 <= now.hour or now.hour < 8:
-         log.info("⏰ Night hours: dehumidifier will not turn on due to presence.")
-         if value == "on":
-             service.call("switch", "turn_off", entity_id="switch.dehumidifier")
-         return
+    now = datetime.now()
+    # Block dehumidifier ON between 23:00 and 08:00
+    if 23 <= now.hour or now.hour < 8:
+        log.info("⏰ Night hours: dehumidifier will not turn on due to presence.")
+        if value == "on":
+            service.call("switch", "turn_off", entity_id="switch.dehumidifier")
+        return
 
     log.info(f"🚪 Presence trigger fired! var_name={var_name}, old={old_value}, new={value}")
     if value == "on":
