@@ -153,7 +153,7 @@ async def control_dehumidifier_on_presence(var_name=None, value=None, old_value=
         else:
             log.info("👤 Presence detected during wait period — keeping dehumidifier off")
 
-@time_trigger("cron(*/5 23-23,0-7 * * *)")
+@time_trigger("cron(*/5 * * * *)")
 def night_dehumidifier_control():
     humidity = state.get("sensor.t_h_inside_sonoff_bathroom_humidity")
     try:
