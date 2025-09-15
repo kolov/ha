@@ -127,16 +127,14 @@ def check_bathroom_humidity():
 
 @state_trigger("binary_sensor.presence_bathroom_occupancy")
 async def control_dehumidifier_on_presence(var_name=None, value=None, old_value=None):
-
+    log.info(f"🚪 Presence trigger fired! var_name={var_name}, old={old_value}, new={value}")
     now = datetime.now()
     # Block dehumidifier ON between 23:00 and 08:00
     if 23 <= now.hour or now.hour < 8:
         log.info("⏰ Night hours: dehumidifier will not turn on due to presence.")
-        if value == "on":
-            service.call("switch", "turn_off", entity_id="switch.dehumidifier")
+        service.call("switch", "turn_off", entity_id="switch.dehumidifier")
         return
 
-    log.info(f"🚪 Presence trigger fired! var_name={var_name}, old={old_value}, new={value}")
     if value == "on":
         log.info("👤 Presence detected in bathroom — turning off dehumidifier")
         task.unique("dehumidifier_delay", kill_me=True)  # Cancel any pending turn-on
@@ -155,10 +153,16 @@ async def control_dehumidifier_on_presence(var_name=None, value=None, old_value=
 
 @time_trigger("cron(*/5 * * * *)")
 def night_dehumidifier_control():
-    humidity = state.get("sensor.t_h_inside_sonoff_bathroom_humidity")
-    try:
-        humidity = float(humidity)
-    except (TypeError, ValueError):
-        return
-    if humidity < 63:
+    now = datetime.now()
+    # Block dehumidifier between 23:00 and 08:00
+    if 23 <= now.hour or now.hour < 8:
+        log.info("⏰ Night hours: dehumidifier will turn off.")
         service.call("switch", "turn_off", entity_id="switch.dehumidifier")
+    else:
+        # Check presence before turning on during day hours
+        current_presence = state.get("binary_sensor.presence_bathroom_occupancy")
+        if current_presence == "off":
+            log.info("⏰ Day hours and no presence: turning on dehumidifier.")
+            service.call("switch", "turn_on", entity_id="switch.dehumidifier")
+        else:
+            log.info("⏰ Day hours but presence detected: keeping dehumidifier off.")
