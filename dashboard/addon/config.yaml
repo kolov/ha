@@ -14,7 +14,9 @@ options:
   ha_url: "http://homeassistant:8123"
   ha_token: ""
   vm_url: "http://192.168.2.39:8428"
+  dashboard_token: ""
 schema:
   ha_url: str
   ha_token: str
   vm_url: str
+  dashboard_token: str?

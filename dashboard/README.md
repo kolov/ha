@@ -38,6 +38,10 @@ static frontend (so no CORS).
 
 ## Notes
 
+- **Limit edits can be gated** by setting `DASHBOARD_TOKEN` (env, or the add-on's
+  `dashboard_token` option). When set, the UI prompts for it before saving and
+  the backend rejects writes without a matching `X-Dashboard-Token` header — so
+  random hosts on the LAN/Tailscale can't change thresholds. Viewing stays open.
 - History comes from VictoriaMetrics (`hass_` Prometheus namespace). It only has
   data for what HA's `prometheus:` integration exposes.
 - Fan-level history isn't graphed (it's a string state); current level shows live.

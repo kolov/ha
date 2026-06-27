@@ -10,7 +10,7 @@ from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -19,6 +19,10 @@ load_dotenv()
 HA_URL = os.environ.get("HA_URL", "http://homeassistant.local:8123").rstrip("/")
 HA_TOKEN = os.environ.get("HA_TOKEN")
 VM_URL = os.environ.get("VM_URL", "http://homeassistant.local:8428").rstrip("/")
+# Shared secret gating limit writes. When set, POST /api/limits requires a
+# matching X-Dashboard-Token header so random hosts on the LAN can't change
+# thresholds. When empty, writes are open (logged warning).
+DASHBOARD_TOKEN = os.environ.get("DASHBOARD_TOKEN", "")
 
 if not HA_TOKEN:
     raise RuntimeError("HA_TOKEN is required — set it in dashboard/backend/.env")
@@ -119,8 +123,16 @@ class LimitUpdate(BaseModel):
     value: float
 
 
+@app.get("/api/limits/auth")
+async def limits_auth_required():
+    """Tells the frontend whether a dashboard token is needed to save."""
+    return {"required": bool(DASHBOARD_TOKEN)}
+
+
 @app.post("/api/limits")
-async def set_limit(upd: LimitUpdate):
+async def set_limit(upd: LimitUpdate, x_dashboard_token: str = Header(default="")):
+    if DASHBOARD_TOKEN and x_dashboard_token != DASHBOARD_TOKEN:
+        raise HTTPException(401, "invalid or missing dashboard token")
     if upd.name not in ALLOWED_LIMITS:
         raise HTTPException(400, f"unknown limit: {upd.name}")
     async with httpx.AsyncClient() as client:

@@ -101,15 +101,31 @@ async function refreshCharts() {
 
 // ---------- limits ----------
 let saveTimers = {};
+
+function getToken() { return localStorage.getItem("dash_token") || ""; }
+function promptToken() {
+  const t = window.prompt("Enter the dashboard token to save changes:");
+  if (t) localStorage.setItem("dash_token", t.trim());
+  return getToken();
+}
+
+async function postLimit(name, value, token) {
+  return fetch("/api/limits", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Dashboard-Token": token },
+    body: JSON.stringify({ name, value: parseFloat(value) }),
+  });
+}
+
 async function saveLimit(name, value, savedEl) {
   clearTimeout(saveTimers[name]);
   saveTimers[name] = setTimeout(async () => {
     try {
-      const r = await fetch("/api/limits", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, value: parseFloat(value) }),
-      });
+      let r = await postLimit(name, value, getToken());
+      if (r.status === 401) {            // need / wrong token — ask once and retry
+        const t = promptToken();
+        if (t) r = await postLimit(name, value, t);
+      }
       if (!r.ok) throw new Error(`save ${name}: HTTP ${r.status}`);
       savedEl.textContent = "saved ✓";
       savedEl.style.color = "";
@@ -117,7 +133,7 @@ async function saveLimit(name, value, savedEl) {
       setTimeout(() => savedEl.classList.remove("show"), 1200);
     } catch (e) {
       console.error(e);
-      savedEl.textContent = "save failed ✗";
+      savedEl.textContent = e.message && e.message.includes("401") ? "auth needed ✗" : "save failed ✗";
       savedEl.style.color = "var(--bad)";
       savedEl.classList.add("show");
     }
