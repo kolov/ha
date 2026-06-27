@@ -1,0 +1,96 @@
+# input_number helpers backing the bathroom ventilation/dehumidifier limits.
+# Source of truth for values that used to be hardcoded constants in
+# pyscript/bathroom.py. Edited from the ventilation dashboard or the HA UI.
+#
+# Wire-up: in configuration.yaml ->  input_number: !include ventilation_limits.yaml
+# After changing this file, call the input_number.reload service (no restart needed).
+
+dehumidifier_off_humidity:
+  name: Dehumidifier off below humidity
+  min: 20
+  max: 90
+  step: 1
+  unit_of_measurement: "%"
+  icon: mdi:water-percent
+  mode: box
+
+humidity_medium_fan:
+  name: Fan medium above humidity
+  min: 30
+  max: 90
+  step: 1
+  unit_of_measurement: "%"
+  icon: mdi:fan-speed-1
+  mode: box
+
+humidity_high_fan:
+  name: Fan high above humidity
+  min: 40
+  max: 95
+  step: 1
+  unit_of_measurement: "%"
+  icon: mdi:fan-speed-2
+  mode: box
+
+humidity_max_fan:
+  name: Fan max above humidity
+  min: 40
+  max: 95
+  step: 1
+  unit_of_measurement: "%"
+  icon: mdi:fan-speed-3
+  mode: box
+
+humidity_diff_ok:
+  name: Humidity diff OK (vs room)
+  min: 0
+  max: 30
+  step: 1
+  unit_of_measurement: "%"
+  icon: mdi:delta
+  mode: box
+
+max_fan_run_time_min:
+  name: Max fan run time
+  min: 5
+  max: 240
+  step: 5
+  unit_of_measurement: min
+  icon: mdi:timer-outline
+  mode: box
+
+fan_cooldown_min:
+  name: Fan cooldown
+  min: 0
+  max: 60
+  step: 1
+  unit_of_measurement: min
+  icon: mdi:timer-sand
+  mode: box
+
+presence_off_delay_sec:
+  name: Dehumidifier on delay after presence
+  min: 0
+  max: 900
+  step: 10
+  unit_of_measurement: s
+  icon: mdi:motion-sensor
+  mode: box
+
+night_start_hour:
+  name: Night start hour
+  min: 0
+  max: 23
+  step: 1
+  unit_of_measurement: h
+  icon: mdi:weather-night
+  mode: box
+
+night_end_hour:
+  name: Night end hour
+  min: 0
+  max: 23
+  step: 1
+  unit_of_measurement: h
+  icon: mdi:weather-sunset-up
+  mode: box
