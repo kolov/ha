@@ -38,16 +38,18 @@ were ineffective/ephemeral here). To enable key auth:
 
 ### One-time HA setup (ventilation limit helpers)
 
-`update_ha.sh` syncs `ha-config/ventilation_limits.yaml` to `/homeassistant` and
-reloads `input_number` on every deploy, but the include line must be added to
-`configuration.yaml` **once**:
+Run once to install the `input_number` helpers and seed their defaults:
 
-```yaml
-input_number: !include ventilation_limits.yaml
+```bash
+./scripts/setup-ha-helpers.sh
 ```
 
-Then restart HA (or reload Input Numbers) once. After that, deploys keep the
-helpers in sync automatically.
+It copies the helper YAML, adds the `input_number: !include ventilation_limits.yaml`
+include to `configuration.yaml` (backed up + validated), reloads `input_number`,
+and seeds each helper to its default (a fresh HA otherwise inits YAML helpers to
+their min). After that, `update_ha.sh` keeps the YAML in sync and reloads on every
+deploy — but does **not** re-seed, so your tuned values persist via `restore_state`.
+Re-running the setup script re-seeds (overwriting tuned values).
 
 ### Manual deploy (fallback, in HA web terminal as root)
 

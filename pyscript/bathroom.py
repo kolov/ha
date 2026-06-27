@@ -203,13 +203,14 @@ async def control_dehumidifier_on_presence(var_name=None, value=None, old_value=
 
     if value == "on":
         log.info("👤 Presence detected in bathroom — turning off dehumidifier")
-        task.unique("dehumidifier_delay", kill_me=True)  # Cancel any pending turn-on
+        task.unique("dehumidifier_delay")  # Cancel any pending turn-on (kill the old sleeper)
         dehumidifier_delay_active = False
         service.call("switch", "turn_off", entity_id="switch.dehumidifier")
     elif value == "off":
         delay = get_limit("presence_off_delay_sec")
         log.info(f"👤 No presence in bathroom — waiting {delay}s before turning on dehumidifier")
-        task.unique("dehumidifier_delay", kill_me=True)
+        # kill_me defaults to False: a new presence-clear cancels the old sleeper and restarts the timer.
+        task.unique("dehumidifier_delay")
         dehumidifier_delay_active = True
         await task.sleep(delay)
         # Check if still no presence after waiting
