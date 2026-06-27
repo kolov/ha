@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bathroom Ventilation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uplot@1.6.31/dist/uPlot.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>🛁 Bathroom Ventilation</h1>
+    <div class="controls">
+      <span id="updated" class="muted"></span>
+      <select id="range">
+        <option value="60">1h</option>
+        <option value="360">6h</option>
+        <option value="1440" selected>24h</option>
+        <option value="4320">3d</option>
+        <option value="10080">7d</option>
+      </select>
+    </div>
+  </header>
+
+  <section id="cards" class="cards"></section>
+
+  <section class="charts">
+    <div class="chart-box"><h2>Humidity</h2><div id="chart-humidity"></div></div>
+    <div class="chart-box"><h2>Dehumidifier</h2><div id="chart-dehumidifier"></div></div>
+    <div class="chart-box"><h2>Presence</h2><div id="chart-presence"></div></div>
+  </section>
+
+  <section class="limits">
+    <h2>Limits</h2>
+    <p class="muted">Changes are saved to Home Assistant immediately and take effect on the next pyscript run.</p>
+    <div id="limits"></div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/uplot@1.6.31/dist/uPlot.iife.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

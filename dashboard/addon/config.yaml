@@ -1,0 +1,20 @@
+name: Ventilation Dashboard
+version: "1.0.0"
+slug: ventilation_dashboard
+description: Bathroom ventilation & dehumidifier dashboard (status, history, editable limits)
+arch:
+  - amd64
+init: false
+ports:
+  "8099/tcp": 8099
+ports_description:
+  "8099/tcp": Web UI
+webui: "http://[HOST]:[PORT:8099]"
+options:
+  ha_url: "http://homeassistant:8123"
+  ha_token: ""
+  vm_url: "http://192.168.2.39:8428"
+schema:
+  ha_url: str
+  ha_token: str
+  vm_url: str
