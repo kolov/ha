@@ -207,7 +207,7 @@ async def control_dehumidifier_on_presence(var_name=None, value=None, old_value=
         current_presence = state.get("binary_sensor.presence_bathroom_occupancy")
         if current_presence == "off":
             if bathroom_humidity_below_threshold():
-                log.info(f"💧 3 minutes passed with no presence but humidity < {DEHUMIDIFIER_OFF_HUMIDITY}% — keeping dehumidifier off")
+                log.info(f"💧 3 minutes passed with no presence but humidity < {get_limit('dehumidifier_off_humidity')}% — keeping dehumidifier off")
             else:
                 log.info("⏱️ 3 minutes passed with no presence — turning on dehumidifier")
                 service.call("switch", "turn_on", entity_id="switch.dehumidifier")
@@ -231,7 +231,7 @@ def night_dehumidifier_control():
             if dehumidifier_delay_active:
                 log.info("⏰ Day hours and no presence, but waiting for delay period — skipping turn on.")
             elif bathroom_humidity_below_threshold():
-                log.info(f"💧 Day hours and no presence, but humidity < {DEHUMIDIFIER_OFF_HUMIDITY}% — turning off dehumidifier.")
+                log.info(f"💧 Day hours and no presence, but humidity < {get_limit('dehumidifier_off_humidity')}% — turning off dehumidifier.")
                 service.call("switch", "turn_off", entity_id="switch.dehumidifier")
             else:
                 log.info("⏰ Day hours and no presence: turning on dehumidifier.")

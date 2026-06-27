@@ -36,6 +36,19 @@ were ineffective/ephemeral here). To enable key auth:
 
 `homeassistant.local` (mDNS) only resolves on the LAN. Off-LAN, reach HA via Tailscale.
 
+### One-time HA setup (ventilation limit helpers)
+
+`update_ha.sh` syncs `ha-config/ventilation_limits.yaml` to `/homeassistant` and
+reloads `input_number` on every deploy, but the include line must be added to
+`configuration.yaml` **once**:
+
+```yaml
+input_number: !include ventilation_limits.yaml
+```
+
+Then restart HA (or reload Input Numbers) once. After that, deploys keep the
+helpers in sync automatically.
+
 ### Manual deploy (fallback, in HA web terminal as root)
 
 ```bash
