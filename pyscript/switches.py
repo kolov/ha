@@ -18,34 +18,13 @@ except ImportError:
     # When running in HASS/Jupyter
     pass
 
- 
 
-@mqtt_trigger("zigbee2mqtt/aqara_switch_1")
-def aqara_switch_1(payload=None): 
-    try:
-        data = json.loads(payload)
-        action =  data.get("action")
-    except Exception as e:
-        log.error(f"Failed to parse MQTT aqara_switch_1 payload: {e}")
-        return
+# Power cycle zehnder_controller every 30 minutes
+@time_trigger("cron(*/30 * * * *)")
+async def power_cycle_zehnder():
+    log.info("🔄 Power cycling zehnder_controller")
+    service.call("switch", "turn_off", entity_id="switch.zehnder_controller")
+    await task.sleep(10)  # Wait 10 seconds
+    service.call("switch", "turn_on", entity_id="switch.zehnder_controller")
+    log.info("✅ zehnder_controller power cycle complete")
 
-    if action == "single_left":
-        log.info("🔌 Toggle switch desk")
-        if state.get("switch.living_desk") == "on":
-            service.call("switch", "turn_off", entity_id="switch.living_desk")
-        else:
-            service.call("switch", "turn_on", entity_id="switch.living_desk")
-    else:
-        log.info(f"No action for {action}") 
-
-# Switch desk off at 20:00
-@time_trigger("cron(0 20 * * *)")
-def turn_off_desk_at_2000():
-    service.call("switch", "turn_off", entity_id="switch.living_desk")
-
-#switch on at 08:30
-@time_trigger("cron(0 8 30 * *)")
-def turn_on_desk_at_0830():
-    service.call("switch", "turn_on", entity_id="switch.living_desk")
-
- 

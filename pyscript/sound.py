@@ -38,7 +38,7 @@ VAR_SILENCE_START: str = "silence_start"
 ## isodatetime | datetime of last time speaker was turned off
 VAR_LAST_OFF_TIME: str = "last_off_time"
 
-# Did not manage to send IR codes from pyscript, calling existing trigerless autmations instead
+# Did not manage to send IR codes from pyscript, calling existing triggerless automations instead
 
 def select_tv_sound_input():
     service.call("automation", "trigger", entity_id="automation.select_tv_sound_input")

@@ -26,6 +26,7 @@ COFFE_MAKING_POWER_LOWER = 800
 COFFEE_MAKING_DURATION_MIN_SECONDS = 10
 
 power_history = []
+pyscript.espresso_power_avg = 0  # Initialize power average
 
 @mqtt_trigger("zigbee2mqtt/espresso_machine")
 def update_power_average(payload=None):
@@ -35,7 +36,7 @@ def update_power_average(payload=None):
         data = json.loads(payload)
         power = float(data.get("power", 0))
     except Exception as e:
-        log.error(f"Failed to parse MQTT power payload: {e}")
+        log.debug(f"Failed to parse MQTT power payload: {e}")
         return
 
     now = datetime.now()
