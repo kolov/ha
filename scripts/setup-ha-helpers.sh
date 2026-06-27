@@ -29,7 +29,14 @@ CFG=/homeassistant/configuration.yaml
 TOKEN=$(grep -oE 'Bearer [A-Za-z0-9._-]+' /homeassistant/reload-python.sh | head -1 | awk '{print $2}')
 [ -n "$TOKEN" ] || { echo "no token in reload-python.sh"; exit 2; }
 
-if ! grep -qE "^input_number:" "$CFG"; then
+if grep -qF "ventilation_limits.yaml" "$CFG"; then
+  echo "ventilation include already present"
+elif grep -qE "^input_number:" "$CFG"; then
+  echo "ERROR: configuration.yaml already has an input_number: section." >&2
+  echo "  YAML can't have two input_number: keys — merge the helpers from" >&2
+  echo "  ha-config/ventilation_limits.yaml into that section manually, then re-run." >&2
+  exit 1
+else
   cp "$CFG" "$CFG.pre-ventilation.bak"
   printf '\n# Ventilation/dehumidifier tunable limits\ninput_number: !include ventilation_limits.yaml\n' >> "$CFG"
   RESP=$(curl -s -X POST http://localhost:8123/api/config/core/check_config \
@@ -38,8 +45,6 @@ if ! grep -qE "^input_number:" "$CFG"; then
     echo "config invalid, reverting: $RESP"; cp "$CFG.pre-ventilation.bak" "$CFG"; exit 1
   fi
   echo "include added + config valid"
-else
-  echo "include already present"
 fi
 
 curl -s -X POST http://localhost:8123/api/services/input_number/reload \
