@@ -54,10 +54,16 @@ def get_limit(name):
 
 
 def is_night_hours(now):
-    """True during the configured night window (e.g. 23:00–08:00)."""
+    """True during the configured night window. Handles both wrapping windows
+    (e.g. 23:00–08:00) and same-day windows (e.g. 08:00–22:00)."""
     start = int(get_limit("night_start_hour"))
     end = int(get_limit("night_end_hour"))
-    return start <= now.hour or now.hour < end
+    hour = now.hour
+    if start == end:
+        return False  # empty window — never night
+    if start < end:
+        return start <= hour < end  # same-day window
+    return hour >= start or hour < end  # wraps past midnight
 
 
 fan_start_time = None
@@ -88,8 +94,11 @@ def check_bathroom_humidity():
     bathroom_small_humidity = state.get("sensor.t_h_inside_bathroom_small_humidity")
     room_humidity = state.get("sensor.t_h_inside_sonoff_bedroom_humidity") 
 
-    if bathroom_humidity is not None:
-        last_humidity = float(bathroom_humidity)
+    if bathroom_humidity is not None and bathroom_humidity not in ("unknown", "unavailable"):
+        try:
+            last_humidity = float(bathroom_humidity)
+        except (ValueError, TypeError):
+            pass
 
     now = datetime.now()
 

@@ -105,14 +105,22 @@ async function saveLimit(name, value, savedEl) {
   clearTimeout(saveTimers[name]);
   saveTimers[name] = setTimeout(async () => {
     try {
-      await fetch("/api/limits", {
+      const r = await fetch("/api/limits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, value: parseFloat(value) }),
       });
+      if (!r.ok) throw new Error(`save ${name}: HTTP ${r.status}`);
+      savedEl.textContent = "saved ✓";
+      savedEl.style.color = "";
       savedEl.classList.add("show");
       setTimeout(() => savedEl.classList.remove("show"), 1200);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+      savedEl.textContent = "save failed ✗";
+      savedEl.style.color = "var(--bad)";
+      savedEl.classList.add("show");
+    }
   }, 350);
 }
 
