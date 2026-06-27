@@ -14,7 +14,7 @@ branch=$(git rev-parse --abbrev-ref HEAD)
 echo "⬆️  Pushing $branch to origin…"
 git push origin "$branch"
 
-echo "🚀 Deploying on HA (checkout $branch + update_ha.sh)…"
-ssh ha "cd /homeassistant/ha && sudo git checkout $branch && sudo ./update_ha.sh"
+echo "🚀 Deploying on HA (fetch + checkout $branch + update_ha.sh)…"
+ssh ha "cd /homeassistant/ha && sudo git fetch origin $branch && sudo git checkout -B $branch origin/$branch && sudo ./update_ha.sh"
 
 echo "✅ Deployed $branch."

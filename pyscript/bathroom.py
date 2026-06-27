@@ -102,15 +102,15 @@ def check_bathroom_humidity():
 
     now = datetime.now()
 
-    if room_humidity is None or room_humidity == 'unknown':
+    if room_humidity in (None, 'unknown', 'unavailable'):
         log.info("🏠 Room humidity not available — assuming 55.")
         room_humidity = 55
 
-    if bathroom_humidity is None or bathroom_humidity == 'unknown':
+    if bathroom_humidity in (None, 'unknown', 'unavailable'):
         log.warning("⚠️ Bathroom humidity sensor not available — assuming 60")
         bathroom_humidity = 60
 
-    if bathroom_small_humidity is None or bathroom_small_humidity == 'unknown':
+    if bathroom_small_humidity in (None, 'unknown', 'unavailable'):
         log.warning("⚠️ Bathroom small humidity sensor not available — assuming 60")
         bathroom_small_humidity = 60
 
