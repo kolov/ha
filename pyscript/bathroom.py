@@ -140,14 +140,13 @@ def check_bathroom_humidity():
     # In cooldown period → run only on low
     if cooldown_until and now < cooldown_until:
         log.info("⏳ In cooldown period — forcing fan to low.")
-        service.call("rest_command", "send_fan_low")
+        set_fan_level("low")
         return
 
     # Overuse → start cooldown
     if fan_start_time and (now - fan_start_time) >= max_fan_run_time:
         log.info(f"🔄 Fan ran on medium/max for {max_fan_run_time} — setting to low and entering cooldown.")
-        service.call("rest_command", "send_fan_low")
-        fan_start_time = None
+        set_fan_level("low")
         cooldown_until = now + fan_cooldown
         return
 
@@ -216,10 +215,12 @@ async def control_dehumidifier_on_presence(var_name=None, value=None, old_value=
         # Check if still no presence after waiting
         current_presence = state.get("binary_sensor.presence_bathroom_occupancy")
         if current_presence == "off":
-            if bathroom_humidity_below_threshold():
-                log.info(f"💧 3 minutes passed with no presence but humidity < {get_limit('dehumidifier_off_humidity')}% — keeping dehumidifier off")
+            if is_night_hours(datetime.now()):
+                log.info("⏰ Night window started during the wait — keeping dehumidifier off")
+            elif bathroom_humidity_below_threshold():
+                log.info(f"💧 {delay}s passed with no presence but humidity < {get_limit('dehumidifier_off_humidity')}% — keeping dehumidifier off")
             else:
-                log.info("⏱️ 3 minutes passed with no presence — turning on dehumidifier")
+                log.info(f"⏱️ {delay}s passed with no presence — turning on dehumidifier")
                 service.call("switch", "turn_on", entity_id="switch.dehumidifier")
         else:
             log.info("👤 Presence detected during wait period — keeping dehumidifier off")
